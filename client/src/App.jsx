@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import axios from "axios";
 import "./App.css";
 
+// Render Backend URL
+const API = import.meta.env.VITE_API_URL;
+
 function App() {
   const [feedback, setFeedback] = useState({
     q1: "",
@@ -20,12 +23,33 @@ function App() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      await axios.post("http://localhost:5000/api/feedback", feedback);
-      alert("Feedback submitted successfully!");
-      setFeedback({ q1: "", q2: "", q3: "", q4: "", q5: "" });
+      if (!API) {
+        throw new Error("Backend API URL is missing");
+      }
+
+      const response = await axios.post(
+        `${API.replace(/\/$/, "")}/api/feedback`,
+        feedback
+      );
+
+      alert(response.data.message || "Feedback submitted successfully!");
+
+      setFeedback({
+        q1: "",
+        q2: "",
+        q3: "",
+        q4: "",
+        q5: "",
+      });
+
     } catch (error) {
-      console.error("Error submitting feedback:", error);
+      console.error(
+        "Error submitting feedback:",
+        error.response?.data || error.message
+      );
+
       alert("Failed to submit feedback. Please try again.");
     }
   };
@@ -33,7 +57,9 @@ function App() {
   return (
     <div className="container">
       <h1>Feedback Form</h1>
+
       <form onSubmit={handleSubmit} className="feedback-form">
+
         <label>Name:</label>
         <input
           type="text"
@@ -79,6 +105,7 @@ function App() {
         />
 
         <button type="submit">Submit</button>
+
       </form>
     </div>
   );
