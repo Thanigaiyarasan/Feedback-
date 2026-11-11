@@ -1,8 +1,8 @@
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
-// https://vite.dev/config/
+// GitHub Pages and Vercel support
 export default defineConfig({
   plugins: [react()],
-  base: '/Feedback-/',
+  base: process.env.GITHUB_ACTIONS ? '/Feedback-/' : '/',
 })
